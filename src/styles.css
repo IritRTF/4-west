@@ -1,0 +1,251 @@
+body {
+    margin: 0px;
+}
+
+.container {
+    font-family: Arial;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-row-gap: 10px;
+    margin: 0 auto;
+    width: 1200px;
+    padding: 10px;
+    background-color: lightgoldenrodyellow;
+}
+
+.playerRow {
+    display: flex;
+    align-items: center;
+}
+
+.playerImage {
+    position: relative;
+    margin-left: 20px;
+    width: 80px;
+    max-height: 80px;
+    overflow: hidden;
+    border: 2px solid saddlebrown;
+    border-radius: 80px;
+}
+
+.playerPower {
+    margin-left: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.playerTable {
+    display: flex;
+}
+
+.playerImage img {
+    width: 80px;
+}
+
+.cardPlaceContainer {
+    margin: 0 5px;
+    width: 170px;
+    height: 230px;
+}
+
+.cardPlace {
+    position: relative;
+}
+
+.cardPlaceEmpty {
+    border: 2px solid saddlebrown;
+    border-radius: 2px;
+    width: 160px;
+    height: 220px;
+}
+
+.deckPlaceContainer {
+    margin: 0 5px;
+    width: 170px;
+    height: 230px;
+}
+
+.deckPlace {
+    position: relative;
+}
+
+.deckPlaceEmpty {
+    border: 2px solid saddlebrown;
+    border-radius: 2px;
+    width: 160px;
+    height: 220px;
+}
+
+.card {
+    transform-style: preserve-3d;
+    position: absolute;
+    width: 164px;
+    height: 224px;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card.fadeOut {
+    opacity: 0;
+}
+
+.card.attackUp {
+    animation-name: attackUpAnimation;
+    animation-timing-function: ease-in-out;
+}
+
+.card.attackDown {
+    animation-name: attackDownAnimation;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes attackUpAnimation {
+    0% { top: 0; }
+    50% { top: -18px; }
+    100% { top: 0; }
+}
+
+@keyframes attackDownAnimation {
+    0% { top: 0; }
+    50% { top: 18px; }
+    100% { top: 0; }
+}
+
+.cardBack {
+    position: absolute;
+    border: 2px solid saddlebrown;
+    border-radius: 2px;
+    background: sandybrown;
+    width: 160px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+}
+
+.cardBack .pattern {
+    margin: 10px;
+    width: 110px;
+    background: sandybrown;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+}
+
+.cardFront {
+    position: absolute;
+    border: 2px solid saddlebrown;
+    border-radius: 2px;
+    background: sandybrown;
+    width: 160px;
+    height: 220px;
+    display: grid;
+    grid-template-rows: 30px auto 30px;
+    backface-visibility: hidden;
+}
+
+.cardHeader {
+    grid-row: 1;
+    background: palegoldenrod;
+    padding: 5px;
+}
+
+.cardName {
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+}
+
+.cardBody {
+    grid-row: 2;
+    position: relative;
+}
+
+.cardImage {
+    left: 5px;
+    right: 5px;
+    position: absolute;
+    height: 100%;
+    text-align: center;
+}
+
+.cardImage img {
+    height: 100%;
+}
+
+.cardDescriptions {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    position: absolute;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+    color: white;
+    text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.cardFooter {
+    grid-row: 3;
+    background: palegoldenrod;
+    padding: 5px;
+}
+
+.cardPower {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.cardSignal,
+.playerSignal {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.0;
+}
+
+.cardSignal {
+    transform: rotateY(180deg);
+}
+
+.cardSignal.damage,
+.playerSignal.damage {
+    background: darkred;
+}
+
+.cardSignal.heal,
+.playerSignal.heal {
+    background: mediumseagreen;
+}
+
+.cardSignal.ability {
+    background: white;
+}
+
+.playerSignal.turnStart {
+    background: white;
+}
+
+.cardSignal.blink,
+.playerSignal.blink {
+    animation-name: blinkAnimation;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes blinkAnimation {
+    0% { opacity: 0.0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.0; }
+}
+
+.templates {
+    display: none;
+}

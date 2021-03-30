@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>World Wide West</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="playerRow"  id="topPlayerRow">
+            <div class="playerImage">
+                <img />
+                <div class="playerSignal"></div>
+            </div>
+            <div class="playerPower">
+                <span class="playerCurrentPower">0</span> / <span class="playerMaxPower">0</span>
+            </div>
+        </div>
+        <div class="playerTable" id="topPlayerTable">
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="deckPlaceContainer">
+                <div class="deckPlace"></div>
+                <div class="deckPlaceEmpty"></div>
+            </div>
+        </div>
+        <div class="playerTable" id="bottomPlayerTable">
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="cardPlaceContainer">
+                <div class="cardPlace"></div>
+                <div class="cardPlaceEmpty"></div>
+            </div>
+            <div class="deckPlaceContainer">
+                <div class="deckPlace"></div>
+                <div class="deckPlaceEmpty"></div>
+            </div>
+        </div>
+        <div class="playerRow" id="bottomPlayerRow">
+            <div class="playerImage">
+                <img />
+                <div class="playerSignal"></div>
+            </div>
+            <div class="playerPower">
+                <span class="playerCurrentPower">0</span> / <span class="playerMaxPower">0</span>
+            </div>
+        </div>
+    </div>
+    <div class="templates">
+        <div class="card flipped" id="cardTemplate">
+            <div class="cardFront">
+                <div class="cardHeader">
+                    <div class="cardName">Название карты</div>
+                </div>
+                <div class="cardBody">
+                    <div class="cardImage">
+                        <img />
+                    </div>
+                    <div class="cardDescriptions">
+                        <div>Описание способности 1</div>
+                        <div>Описание способности 2</div>
+                    </div>
+                </div>
+                <div class="cardFooter">
+                    <div class="cardPower"><span class="cardCurrentPower">10</span> / <span class="cardMaxPower">10</span></div>
+                </div>
+            </div>
+            <div class="cardBack">
+                <div class="pattern">World</div>
+                <div class="pattern">Wide</div>
+                <div class="pattern">West</div>
+            </div>
+            <div class="cardSignal"></div>
+        </div>
+    </div>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
