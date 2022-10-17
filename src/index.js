@@ -27,32 +27,86 @@ function getCreatureDescription(card) {
     return 'Существо';
 }
 
+class Creature extends Card{
+    constructor(){
+        super();
+    }
 
+    getDescriptions(){
+        return [getCreatureDescription(this), super.getDescriptions()];
+    }
+}
 
-// Основа для утки.
-function Duck() {
-    this.quacks = function () { console.log('quack') };
-    this.swims = function () { console.log('float: both;') };
+class Duck extends Creature{
+    constructor(name = "Мирная утка", currentPower = 2){
+        super();
+        this.name = name;
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
+    quacks() { console.log('quack'); return true;};
+    swims() { console.log('float: both;'); return true; };
+}
+
+class Dog extends Creature{
+    constructor(name = "Пес-бандит", currentPower = 3){
+        super();
+        this.name = name;
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
+}
+
+class Trasher extends Dog{
+    constructor(name = "Громила", currentPower = 5){
+        super();
+        this.name = name;
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
+
+    //Правильно ли работает?
+    modifyTakenDamage(value, fromCard, gameContext, continuation) {
+        if (value - 1 != 0)
+            this.view.signalAbility(() => {continuation(value - 1);})
+        else
+            continuation(value - 1);
+    }
 }
 
 
-// Основа для собаки.
-function Dog() {
+class Gatling extends Creature{
+    constructor(name = "Гатлинг", currentPower = 6){
+        super();
+        this.name = name;
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
 }
 
 
-// Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
+    new Duck(),
+    new Duck(),
+    new Duck(),
+    new Gatling(),
 ];
-
-// Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Card('Бандит', 3),
+    new Trasher(),
+    new Dog(),
+    new Dog(),
 ];
 
+// // Колода Шерифа, нижнего игрока.
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+// ];
+
+// const banditStartDeck = [
+//     new Trasher(),
+// ];
 
 // Создание игры.
 const game = new Game(seriffStartDeck, banditStartDeck);
@@ -64,3 +118,6 @@ SpeedRate.set(1);
 game.play(false, (winner) => {
     alert('Победил ' + winner.name);
 });
+
+
+
