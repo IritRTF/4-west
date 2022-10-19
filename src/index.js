@@ -73,6 +73,23 @@ class Dog extends Creature{
     }
 }
 
+class PseudoDuck extends Dog{
+    constructor(){
+        super()
+        this.name = "Псевдоутка";
+        this.maxPower = 3;
+        this.currentPower = this.maxPower;
+    }
+    quacks() 
+    { 
+        onsole.log('quack') 
+    };
+    swims() 
+    { 
+        console.log('float: both;') 
+    };
+}
+
 class Lad extends Dog{
     static inGameCount;
     constructor(){
@@ -129,6 +146,55 @@ class Gatling extends Creature{
 
 }
 
+
+class Rogue extends Creature{
+    constructor(){
+        super()
+        this.name = "Изгой";
+        this.maxPower = 2;
+        this.currentPower = this.maxPower;
+    }
+    attack(gameContext, continuation){
+        const taskQueue = new TaskQueue();
+
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+
+        taskQueue.push(onDone => this.view.showAttack(onDone));
+        taskQueue.push(onDone => {
+            const oppositeCard = oppositePlayer.table[position];
+            const proto = Object.getPrototypeOf(oppositeCard)
+            
+            if (proto.hasOwnProperty("modifyDealedDamageToCreature"))
+            {
+                this.modifyDealedDamageToCreature = proto.modifyDealedDamageToCreature;
+                delete proto["modifyDealedDamageToCreature"]
+            }
+                
+            if (proto.hasOwnProperty("modifyDealedDamageToPlayer"))
+            {
+                this.modifyDealedDamageToPlayer = proto.modifyDealedDamageToPlayer;
+                delete proto["modifyDealedDamageToPlayer"]
+            }
+            
+            if (proto.hasOwnProperty("modifyTakenDamage"))
+            {
+                this.modifyTakenDamage = proto.modifyTakenDamage;
+                delete proto["modifyTakenDamage"]
+            }
+            gameContext.updateView()
+
+            if (oppositeCard) {
+                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+            } else {
+                this.dealDamageToPlayer(1, gameContext, onDone);
+            }
+        });
+
+        taskQueue.continueWith(continuation);
+    }
+}
+
+
 class Trasher extends Dog{
     constructor(){
         super()
@@ -143,15 +209,57 @@ class Trasher extends Dog{
 }
 
 
+class Brewer extends Duck{
+    constructor(){
+        super()
+        this.name = "Пивовар"
+        this.maxPower = 2
+        this.currentPower = this.maxPower
+    }
+
+    attack(gameContext, continuation){
+        const taskQueue = new TaskQueue();
+
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+
+        let allCards = currentPlayer.table.concat(oppositePlayer.table);
+        allCards.forEach(card => {
+            if (isDuck(card))
+            {
+                card.view.signalHeal();
+                card.maxPower += 1;
+                card.currentPower = (card.currentPower + 2 <= card.maxPower) ? card.currentPower + 2 : card.currentPower + 1
+                card.updateView();  
+            }
+        });
+
+        taskQueue.push(onDone => this.view.showAttack(onDone));
+        taskQueue.push(onDone => {
+            const oppositeCard = oppositePlayer.table[position];
+            const proto = Object.getPrototypeOf(oppositeCard)
+            gameContext.updateView()
+
+            if (oppositeCard) {
+                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+            } else {
+                this.dealDamageToPlayer(1, gameContext, onDone);
+            }
+        });
+
+        taskQueue.continueWith(continuation);
+    }
+}
+
+
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
-    new Duck(),
-    new Duck(),
+    new Brewer
 ];
 const banditStartDeck = [
-    new Lad(),
-    new Lad(),
+    new PseudoDuck(),
+    new PseudoDuck(),
+    new Dog()
 ];
 
 
