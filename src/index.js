@@ -158,42 +158,48 @@ class Rogue extends Creature{
         const taskQueue = new TaskQueue();
 
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        
+            taskQueue.push(onDone => this.view.showAttack(onDone));
+            taskQueue.push(onDone => {
+                const oppositeCard = oppositePlayer.table[position];
+                if(oppositeCard!==undefined && oppositeCard!==null ){//проверка на наличие опонента
+                    
+                    console.log(oppositeCard)
+                    const proto = Object.getPrototypeOf(oppositeCard)
 
-        taskQueue.push(onDone => this.view.showAttack(onDone));
-        taskQueue.push(onDone => {
-            const oppositeCard = oppositePlayer.table[position];
-            const proto = Object.getPrototypeOf(oppositeCard)
-            
-            if (proto.hasOwnProperty("modifyDealedDamageToCreature"))
-            {
-                this.modifyDealedDamageToCreature = proto.modifyDealedDamageToCreature;
-                delete proto["modifyDealedDamageToCreature"]
-            }
-                
-            if (proto.hasOwnProperty("modifyDealedDamageToPlayer"))
-            {
-                this.modifyDealedDamageToPlayer = proto.modifyDealedDamageToPlayer;
-                delete proto["modifyDealedDamageToPlayer"]
-            }
-            
-            if (proto.hasOwnProperty("modifyTakenDamage"))
-            {
-                this.modifyTakenDamage = proto.modifyTakenDamage;
-                delete proto["modifyTakenDamage"]
-            }
-            gameContext.updateView()
+                    if (proto.hasOwnProperty("modifyDealedDamageToCreature"))
+                    {
+                        this.modifyDealedDamageToCreature = proto.modifyDealedDamageToCreature;
+                        delete proto["modifyDealedDamageToCreature"]
+                    }
 
-            if (oppositeCard) {
-                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
-            } else {
-                this.dealDamageToPlayer(1, gameContext, onDone);
-            }
-        });
+                    if (proto.hasOwnProperty("modifyDealedDamageToPlayer"))
+                    {
+                        this.modifyDealedDamageToPlayer = proto.modifyDealedDamageToPlayer;
+                        delete proto["modifyDealedDamageToPlayer"]
+                    }
 
+                    if (proto.hasOwnProperty("modifyTakenDamage"))
+                    {
+                        this.modifyTakenDamage = proto.modifyTakenDamage;
+                        delete proto["modifyTakenDamage"]
+                    }
+                    
+
+                    if (oppositeCard) {
+                        this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+                    }
+                }
+                else
+                {
+                    this.dealDamageToPlayer(1, gameContext, onDone);
+                }
+            });
+        
+        gameContext.updateView()
         taskQueue.continueWith(continuation);
     }
 }
-
 
 class Trasher extends Dog{
     constructor(){
@@ -236,30 +242,74 @@ class Brewer extends Duck{
         taskQueue.push(onDone => this.view.showAttack(onDone));
         taskQueue.push(onDone => {
             const oppositeCard = oppositePlayer.table[position];
-            const proto = Object.getPrototypeOf(oppositeCard)
-            gameContext.updateView()
-
-            if (oppositeCard) {
+            if(oppositeCard!==undefined && oppositeCard!==null)//Проверил есть ли оппозиция 
+            {
+                const proto = Object.getPrototypeOf(oppositeCard)
+            
                 this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
-            } else {
+            } 
+            else {
                 this.dealDamageToPlayer(1, gameContext, onDone);
             }
         });
-
+        gameContext.updateView()
         taskQueue.continueWith(continuation);
     }
 }
 
 
+class Nemo extends Creature {
+    constructor() {
+        super();
+        this.name = "Немо";
+        this.maxPower = 4;
+        this.currentPower = this.maxPower;
+    }
+
+    doBeforeAttack(gameContext, continuation) {
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        if(oppositePlayer.table[position]!==undefined && oppositePlayer.table[position]!=null)//Проверил есть ли оппозиция
+        {
+            let oppositePlayerProto = Object.getPrototypeOf(oppositePlayer.table[position]);
+            Object.setPrototypeOf(this, oppositePlayerProto);
+            
+            if (oppositePlayerProto.hasOwnProperty("modifyDealedDamageToCreature"))
+            {
+                this.modifyDealedDamageToCreature = oppositePlayerProto.modifyDealedDamageToCreature;
+            }
+
+            if (oppositePlayerProto.hasOwnProperty("modifyDealedDamageToPlayer"))
+            {
+                this.modifyDealedDamageToPlayer = oppositePlayerProto.modifyDealedDamageToPlayer;
+            }
+
+            if (oppositePlayerProto.hasOwnProperty("modifyTakenDamage"))
+            {
+                this.modifyTakenDamage = oppositePlayerProto.modifyTakenDamage;
+            }
+        }
+        else {
+            this.dealDamageToPlayer(this.currentPower, gameContext, continuation);
+        }
+        gameContext.updateView();
+        continuation();
+    };
+}
+
+
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
+    new Trasher(),
+    new Rogue(),
+    new Gatling(),
     new Duck(),
-    new Brewer
+
 ];
 const banditStartDeck = [
-    new PseudoDuck(),
-    new PseudoDuck(),
-    new Dog()
+    new Nemo(),
+    new Gatling(),
+    new Rogue(),
+    new Duck(),
 ];
 
 
