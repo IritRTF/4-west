@@ -7,8 +7,7 @@ const Card = function () {
         this.image = image;
 
         this.maxPower = maxPower;
-        this.currentPower = maxPower;
-
+        this.currentPower = this.maxPower;
         this.view = new View();
         this.updateView();
     }
