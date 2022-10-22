@@ -1,7 +1,7 @@
-import {default as View} from './CardView.js';
+import { default as View } from './CardView.js';
 import TaskQueue from './TaskQueue.js';
 
-const Card = function () {
+const Card = (function () {
     function Card(name, maxPower, image) {
         this.name = name;
         this.image = image;
@@ -24,10 +24,12 @@ const Card = function () {
     Card.prototype.comeIntoPlay = function (gameContext, place, continuation) {
         const taskQueue = new TaskQueue();
 
-        taskQueue.push(onDone => this.view.flipFront(onDone));
-        taskQueue.push(onDone => this.view.moveTo(place, onDone));
+        taskQueue.push((onDone) => this.view.flipFront(onDone));
+        taskQueue.push((onDone) => this.view.moveTo(place, onDone));
 
-        taskQueue.push(onDone => this.doAfterComingIntoPlay(gameContext, onDone));
+        taskQueue.push((onDone) =>
+            this.doAfterComingIntoPlay(gameContext, onDone)
+        );
 
         taskQueue.continueWith(continuation);
     };
@@ -35,8 +37,12 @@ const Card = function () {
     // Вызывается при входе карты в игру, сразу после размещения карты в нужной позиции на столе.
     // Можно переопределить в наследниках.
     // Позволяет определять способности, которые должны активироваться при входе в игру.
-    Card.prototype.doAfterComingIntoPlay = function (gameContext, continuation) {
-        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+    Card.prototype.doAfterComingIntoPlay = function (
+        gameContext,
+        continuation
+    ) {
+        const { currentPlayer, oppositePlayer, position, updateView } =
+            gameContext;
         continuation();
     };
 
@@ -45,11 +51,15 @@ const Card = function () {
     Card.prototype.actInTurn = function (gameContext, continuation) {
         const taskQueue = new TaskQueue();
 
-        taskQueue.push(onDone => this.doBeforeAttack(gameContext, onDone));
-        taskQueue.push(onDone => this.attack(gameContext, onDone));
+        taskQueue.push((onDone) => this.doBeforeAttack(gameContext, onDone));
+        taskQueue.push((onDone) => this.attack(gameContext, onDone));
 
-        taskQueue.push(onDone => gameContext.oppositePlayer.removeDead(onDone));
-        taskQueue.push(onDone => gameContext.currentPlayer.removeDead(onDone));
+        taskQueue.push((onDone) =>
+            gameContext.oppositePlayer.removeDead(onDone)
+        );
+        taskQueue.push((onDone) =>
+            gameContext.currentPlayer.removeDead(onDone)
+        );
 
         taskQueue.continueWith(continuation);
     };
@@ -58,7 +68,8 @@ const Card = function () {
     // Можно переопределить в наследниках.
     // Позволяет определять способности, которые должны активироваться при атаке.
     Card.prototype.doBeforeAttack = function (gameContext, continuation) {
-        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        const { currentPlayer, oppositePlayer, position, updateView } =
+            gameContext;
         continuation();
     };
 
@@ -69,14 +80,20 @@ const Card = function () {
     Card.prototype.attack = function (gameContext, continuation) {
         const taskQueue = new TaskQueue();
 
-        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        const { currentPlayer, oppositePlayer, position, updateView } =
+            gameContext;
 
-        taskQueue.push(onDone => this.view.showAttack(onDone));
-        taskQueue.push(onDone => {
+        taskQueue.push((onDone) => this.view.showAttack(onDone));
+        taskQueue.push((onDone) => {
             const oppositeCard = oppositePlayer.table[position];
 
             if (oppositeCard) {
-                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+                this.dealDamageToCreature(
+                    this.currentPower,
+                    oppositeCard,
+                    gameContext,
+                    onDone
+                );
             } else {
                 this.dealDamageToPlayer(1, gameContext, onDone);
             }
@@ -88,22 +105,37 @@ const Card = function () {
     // Определяет правила нанесения урона другим картам.
     // Нельзя переопределять в наследниках.
     // Нужно использовать при изменении поведения карты при атаке.
-    Card.prototype.dealDamageToCreature = function (value, toCard, gameContext, continuation) {
+    Card.prototype.dealDamageToCreature = function (
+        value,
+        toCard,
+        gameContext,
+        continuation
+    ) {
         const taskQueue = new TaskQueue();
 
         let actualValue = value;
 
-        taskQueue.push(onDone => {
-            this.modifyDealedDamageToCreature(actualValue, toCard, gameContext, (v) => {
-                if (v !== undefined) {
-                    actualValue = v;
+        taskQueue.push((onDone) => {
+            this.modifyDealtDamageToCreature(
+                actualValue,
+                toCard,
+                gameContext,
+                (v) => {
+                    if (v !== undefined) {
+                        actualValue = v;
+                    }
+                    onDone();
                 }
-                onDone();
-            });
+            );
         });
 
-        taskQueue.push(onDone => {
-            toCard.takeDamage(Math.max(actualValue, 0), this, gameContext, onDone);
+        taskQueue.push((onDone) => {
+            toCard.takeDamage(
+                Math.max(actualValue, 0),
+                this,
+                gameContext,
+                onDone
+            );
         });
 
         taskQueue.continueWith(continuation);
@@ -112,20 +144,29 @@ const Card = function () {
     // Изменяет урон, наносимый картой при атаке карт противника.
     // Можно переопределить в наследниках.
     // Позволяет определять способности, которые меняют наносимый урон при атаке карт противника.
-    Card.prototype.modifyDealedDamageToCreature = function (value, toCard, gameContext, continuation) {
+    Card.prototype.modifyDealtDamageToCreature = function (
+        value,
+        toCard,
+        gameContext,
+        continuation
+    ) {
         continuation(value);
     };
 
     // Определяет правила нанесения урона игроку-противнику.
     // Нельзя переопределять в наследниках.
     // Нужно использовать при изменении поведения карты при атаке.
-    Card.prototype.dealDamageToPlayer = function (value, gameContext, continuation) {
+    Card.prototype.dealDamageToPlayer = function (
+        value,
+        gameContext,
+        continuation
+    ) {
         const taskQueue = new TaskQueue();
 
         let actualValue = value;
 
-        taskQueue.push(onDone => {
-            this.modifyDealedDamageToPlayer(actualValue, gameContext, (v) => {
+        taskQueue.push((onDone) => {
+            this.modifyDealtDamageToPlayer(actualValue, gameContext, (v) => {
                 if (v !== undefined) {
                     actualValue = v;
                 }
@@ -133,8 +174,11 @@ const Card = function () {
             });
         });
 
-        taskQueue.push(onDone => {
-            gameContext.oppositePlayer.takeDamage(Math.max(actualValue, 0), onDone);
+        taskQueue.push((onDone) => {
+            gameContext.oppositePlayer.takeDamage(
+                Math.max(actualValue, 0),
+                onDone
+            );
         });
 
         taskQueue.continueWith(continuation);
@@ -143,18 +187,27 @@ const Card = function () {
     // Изменяет урон, наносимый картой при атаке игрока-противника.
     // Можно переопределить в наследниках.
     // Позволяет определять способности, которые меняют наносимый урон при атаке игрока-противника.
-    Card.prototype.modifyDealedDamageToPlayer = function (value, gameContext, continuation) {
+    Card.prototype.modifyDealtDamageToPlayer = function (
+        value,
+        gameContext,
+        continuation
+    ) {
         continuation(value);
     };
 
     // Определяет правила получения картой урона.
     // Нельзя переопределять в наследниках.
-    Card.prototype.takeDamage = function (value, fromCard, gameContext, continuation) {
+    Card.prototype.takeDamage = function (
+        value,
+        fromCard,
+        gameContext,
+        continuation
+    ) {
         const taskQueue = new TaskQueue();
 
         let actualValue = value;
 
-        taskQueue.push(onDone => {
+        taskQueue.push((onDone) => {
             this.modifyTakenDamage(actualValue, fromCard, gameContext, (v) => {
                 if (v !== undefined) {
                     actualValue = v;
@@ -163,7 +216,7 @@ const Card = function () {
             });
         });
 
-        taskQueue.push(onDone => {
+        taskQueue.push((onDone) => {
             if (actualValue <= 0) {
                 onDone();
                 return;
@@ -180,7 +233,12 @@ const Card = function () {
     // Изменяет урон, наносимый карте.
     // Можно переопределить в наследниках.
     // Позволяет определять способности, которые меняют наносимый карте урон.
-    Card.prototype.modifyTakenDamage = function (value, fromCard, gameContext, continuation) {
+    Card.prototype.modifyTakenDamage = function (
+        value,
+        fromCard,
+        gameContext,
+        continuation
+    ) {
         continuation(value);
     };
 
@@ -195,8 +253,8 @@ const Card = function () {
     Card.prototype.removeFromGame = function (continuation) {
         const taskQueue = new TaskQueue();
 
-        taskQueue.push(onDone => this.doBeforeRemoving(onDone));
-        taskQueue.push(onDone => this.view.remove(onDone));
+        taskQueue.push((onDone) => this.doBeforeRemoving(onDone));
+        taskQueue.push((onDone) => this.view.remove(onDone));
 
         taskQueue.continueWith(continuation);
     };
@@ -211,20 +269,17 @@ const Card = function () {
     // Строит описания карты, которые показываются на ее лицевой стороне.
     // Можно переопределить в наследниках.
     Card.prototype.getDescriptions = function () {
-        return [
-            getInheritanceDescription(this)
-        ];
+        return [getInheritanceDescription(this)];
     };
 
     // Строит описание цепочки прототипов с помощью имен конструкторов.
-    function getInheritanceDescription (card) {
+    function getInheritanceDescription(card) {
         const names = [];
         let obj = card;
         while (true) {
             obj = Object.getPrototypeOf(obj);
             names.push(obj.constructor.name);
-            if (obj === Card.prototype)
-                break;
+            if (obj === Card.prototype) break;
         }
         return names.join('➔ ');
     }
@@ -238,11 +293,11 @@ const Card = function () {
             descriptions: this.getDescriptions(),
             image: this.image,
             currentPower: this.currentPower,
-            maxPower: this.maxPower
+            maxPower: this.maxPower,
         });
     };
 
     return Card;
-}();
+})();
 
 export default Card;

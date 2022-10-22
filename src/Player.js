@@ -2,7 +2,7 @@ import TaskQueue from './TaskQueue.js';
 
 const PLAYER_MAX_POWER = 10;
 
-const Player = function () {
+const Player = (function () {
     function Player(game, name, image, deck, view) {
         this.game = game;
         this.name = name;
@@ -22,7 +22,7 @@ const Player = function () {
     Player.prototype.buildDeck = function () {
         let position = 0;
         for (const card of this.deck) {
-            card.putInDeck(this.view.deck, this.view.inBottomRow, position)
+            card.putInDeck(this.view.deck, this.view.inBottomRow, position);
             position++;
         }
     };
@@ -30,7 +30,7 @@ const Player = function () {
     Player.prototype.takeDamage = function (value, continuation) {
         const taskQueue = new TaskQueue();
 
-        taskQueue.push(onDone => {
+        taskQueue.push((onDone) => {
             this.currentPower = this.currentPower - value;
             this.updateView();
 
@@ -43,10 +43,13 @@ const Player = function () {
     Player.prototype.playNewCard = function (continuation) {
         const taskQueue = new TaskQueue();
 
-        taskQueue.push(onDone => this.view.signalTurnStart(onDone));
+        taskQueue.push((onDone) => this.view.signalTurnStart(onDone));
 
-        taskQueue.push(onDone => {
-            if (this.deck.length === 0 || this.table.length >= this.maxTableSize) {
+        taskQueue.push((onDone) => {
+            if (
+                this.deck.length === 0 ||
+                this.table.length >= this.maxTableSize
+            ) {
                 onDone();
                 return;
             }
@@ -67,8 +70,8 @@ const Player = function () {
     Player.prototype.applyCards = function (continuation) {
         const taskQueue = new TaskQueue();
 
-        for(let position = 0; position < this.table.length; position++) {
-            taskQueue.push(onDone => {
+        for (let position = 0; position < this.table.length; position++) {
+            taskQueue.push((onDone) => {
                 const card = this.table[position];
                 if (card) {
                     const gameContext = this.game.getContextForCard(position);
@@ -89,8 +92,8 @@ const Player = function () {
     Player.prototype.removeDead = function (continuation) {
         const taskQueue = new TaskQueue();
 
-        for(let position = 0; position < this.table.length; position++) {
-            taskQueue.push(onDone => {
+        for (let position = 0; position < this.table.length; position++) {
+            taskQueue.push((onDone) => {
                 const card = this.table[position];
                 if (!card || card.currentPower > 0) {
                     onDone();
@@ -107,8 +110,8 @@ const Player = function () {
     Player.prototype.compactTable = function (continuation) {
         const taskQueue = new TaskQueue();
 
-        for(let position = 0; position < this.table.length; position++) {
-            taskQueue.push(onDone => {
+        for (let position = 0; position < this.table.length; position++) {
+            taskQueue.push((onDone) => {
                 if (this.table[position]) {
                     onDone();
                     return;
@@ -139,7 +142,7 @@ const Player = function () {
         this.view.updateData({
             image: this.image,
             currentPower: this.currentPower,
-            maxPower: this.maxPower
+            maxPower: this.maxPower,
         });
         for (const card of this.table) {
             if (card) {
@@ -149,6 +152,6 @@ const Player = function () {
     };
 
     return Player;
-}();
+})();
 
 export default Player;

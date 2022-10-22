@@ -139,14 +139,14 @@ const banditStartDeck = [
   Выглядеть будет как-то так: Lad.getBonus = function () { ... }
 - обрати внимание на то, чему равен this в методе getBonus. Можно догадаться, либо посмотреть в отладчике.
   Можно ли упростить метод getBonus за счет этого?
-- переопредели методы modifyDealedDamageToCreature и modifyTakenDamage, чтобы они использовали бонус.
+- переопредели методы modifyDealtDamageToCreature и modifyTakenDamage, чтобы они использовали бонус.
 
 Добавь в описание карты «Чем их больше, тем они сильнее».
 Этот текст должен появляться только если непосредственно у братков (т.е. в Lad.prototype)
-переопределены методы modifyDealedDamageToCreature или modifyTakenDamage.
+переопределены методы modifyDealtDamageToCreature или modifyTakenDamage.
 Проверка на наличие свойства непосредственно у объекта выполняется с помщью метода hasOwnProperty.
-Проверка наличия метода modifyDealedDamageToCreature у братков выглядит так:
-    Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature')
+Проверка наличия метода modifyDealtDamageToCreature у братков выглядит так:
+    Lad.prototype.hasOwnProperty('modifyDealtDamageToCreature')
 Эта особенность понадобится на следующем шаге.
 
 Колоды для проверки:
@@ -173,7 +173,7 @@ const banditStartDeck = [
   Изгой получает эти способности, но не передает их другим Изгоям.
 
 Подсказки:
-- Изгой похищает эти способности: modifyDealedDamageToCreature, modifyDealedDamageToPlayer, modifyTakenDamage
+- Изгой похищает эти способности: modifyDealtDamageToCreature, modifyDealtDamageToPlayer, modifyTakenDamage
 - Чтобы похитить способности у всех карт некоторого типа, надо взять их из прототипа
 - Получить доступ к прототипу некоторой карты можно так: Object.getPrototypeOf(card)
 - Чтобы не похищать способности у других типов, нельзя задевать прототип прототипа
