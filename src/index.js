@@ -28,8 +28,16 @@ function getCreatureDescription(card) {
 }
 
 class Creature extends Card{
-    constructor(){
+    constructor(name, maxPower, image) {
         super();
+    };
+
+    get currentPower(){
+        return this._currentPower;
+    }
+
+    set currentPower(value){
+        this._currentPower = (value <= this.maxPower) ? value : this.maxPower;
     }
 
     getDescriptions(){
@@ -142,7 +150,6 @@ class Lad extends Dog {
 
     modifyDealedDamageToCreature(value, toCard, gameContext, continuation) {
         let bonus = Lad.getBonus();
-        console.log(bonus)
         continuation(value + bonus);
     };
 
@@ -151,20 +158,19 @@ class Lad extends Dog {
         continuation(value - Lad.getBonus());
     };
 
-    getDescriptions(){
-        let descriptions = super.getDescriptions();
-        if(Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature') || Lad.prototype.hasOwnProperty('modifyTakenDamage')){
-            return ['«Чем их больше, тем они сильнее»', descriptions[0], descriptions[1]];
-        }
-        return [getInheritanceDescription(this), descriptions[0], descriptions[1]];
-    }
-
-    // getDescriptions() {
+    // getDescriptions(){
+    //     let descriptions = super.getDescriptions();
     //     if(Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature') || Lad.prototype.hasOwnProperty('modifyTakenDamage')){
-    //         return [getInheritanceDescription(this)];
+    //         return ['«Чем их больше, тем они сильнее»', descriptions[1]];
     //     }
-    //     return [getInheritanceDescription(this)];
-    // };
+    //     return [getInheritanceDescription(this), descriptions[1]];
+    // }
+    
+    getDescriptions() {
+        let descriptions = super.getDescriptions();
+        descriptions[0] = 'Чем их больше, тем они сильнее';
+        return descriptions;
+    }
 }
 
 //Не вызывается из Card
@@ -181,8 +187,116 @@ function getInheritanceDescription (card) {
 }
 
 // 7 задание
+class Rogue extends Creature { 
+    constructor(name = 'Изгой', currentPower = 2) { 
+        super(); 
+        this.name = name; 
+        this.maxPower = currentPower; 
+        this.currentPower = currentPower; 
+    }; 
+ 
+    doBeforeAttack(gameContext, continuation) { 
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext; 
+        let enemy = oppositePlayer.table[position]; 
+        let proto = Object.getPrototypeOf(enemy); 
+        let roguePrototype = Object.getPrototypeOf(enemy); 
+        let cards = Object.getOwnPropertyNames(roguePrototype); 
+        for (let i = 0; i <cards.length; i++) { 
+            if (proto.hasOwnProperty("modifyDealedDamageToCreature")) { 
+                this.modifyDealedDamageToCreature = proto.modifyDealedDamageToCreature;
+                delete proto["modifyDealedDamageToCreature"]; 
+            } 
+            if (proto.hasOwnProperty("modifyDealedDamageToPlayer")) { 
+                this.modifyDealedDamageToPlayer = proto.modifyDealedDamageToPlayer;
+                delete proto["modifyDealedDamageToPlayer"]; 
+            } 
+            if (proto.hasOwnProperty("modifyTakenDamage")) { 
+                this.modifyTakenDamage = proto.modifyTakenDamage;
+                delete proto["modifyTakenDamage"];
+            } 
+        }; 
+        updateView(); 
+        continuation(); 
+    } 
+}
 
-// //Проверка 3
+// 8 задание
+class Brewer extends Duck{
+    constructor(name = 'Пивовар', currentPower = 2){
+        super();
+        this.name = name
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
+
+    attack(gameContext, continuation){
+        const taskQueue = new TaskQueue();
+
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+
+        let allCards = currentPlayer.table.concat(oppositePlayer.table);
+        allCards.forEach(card => {
+            if (isDuck(card)) {
+                card.view.signalHeal();
+                card.maxPower += 1;
+                card.currentPower += 2
+                card.updateView();
+            }
+        });
+
+        taskQueue.push(onDone => this.view.showAttack(onDone));
+        taskQueue.push(onDone => {
+            const oppositeCard = oppositePlayer.table[position];
+            if(oppositeCard !== undefined && oppositeCard !== null) {
+                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+            }
+            else {
+                this.dealDamageToPlayer(1, gameContext, onDone);
+            }
+        });
+        gameContext.updateView();
+        taskQueue.continueWith(continuation);
+    }
+}
+
+// 9 задание
+class PseudoDuck extends Dog {
+    constructor(name = 'Псевдоутка', currentPower = 3) {
+        super();
+        this.name = name;
+        this.maxPower = currentPower;
+        this.currentPower = currentPower;
+    }
+
+    quacks() { console.log('quack'); return true; };
+
+    swims() { console.log('float: both;'); return true; };
+}
+
+// 10 задание 
+class Nemo extends Creature{
+    constructor(name = "Nemo"){
+        super();
+        this.name = name;
+        this.wasStealed = false;
+        this.maxPower = 4;
+        this.currentPower = this.maxPower;
+    }
+    
+    doBeforeAttack(gameContext, continuation) {
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        const oppositeCard = oppositePlayer.table[position];
+        if (oppositeCard && !this.wasStealed) {
+            this.wasStealed = true;
+            Object.setPrototypeOf(this, oppositeCard);
+            this.doBeforeAttack(gameContext, continuation);
+        }
+        continuation();
+        gameContext.updateView();
+    }
+}
+
+// //Проверка 2
 // const seriffStartDeck = [
 //     new Duck(),
 //     new Duck(),
@@ -192,7 +306,7 @@ function getInheritanceDescription (card) {
 //     new Dog(),
 // ];
 
-//Проверка 4
+// // Проверка 4
 // const seriffStartDeck = [
 //     new Duck(),
 //     new Duck(),
@@ -226,6 +340,52 @@ function getInheritanceDescription (card) {
 //     new Lad(),
 //     new Lad(),
 // ];
+
+// // Проверка 7
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+//     new Rogue(),
+// ];
+// const banditStartDeck = [
+//     new Lad(),
+//     new Lad(),
+//     new Lad(),
+// ];
+
+// // Проверка 8
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Brewer(),
+// ];
+// const banditStartDeck = [
+//     new Dog(),
+//     new Dog(),
+//     new Dog(),
+//     new Dog(),
+// ];
+
+// //Проверка 9
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Brewer(),
+// ];
+// const banditStartDeck = [
+//     // new Dog(),
+//     new PseudoDuck(),
+//     new Dog(),
+// ];
+
+//Проверка 10
+const seriffStartDeck = [
+    new Nemo(),
+];
+const banditStartDeck = [
+    new Gatling(),
+    new Dog(),
+    new Dog(),
+];
 
 // Создание игры.
 const game = new Game(seriffStartDeck, banditStartDeck);
