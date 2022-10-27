@@ -17,6 +17,46 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max) + 1;
 }
 
+function buildRandomStarterDeckForSeriff() {
+    let result = [];
+    for (let i = 0; i < 15; ++i) {
+        let a = getRandomInt(10);
+        if (1 <= a && a <= 2) {
+            result.push(new Duck());
+        }
+        else if (3 <= a && a <= 4) {
+            result.push(new Rogue());
+        }
+        else if (5 <= a && a <= 6) {
+            result.push(new Brewer());
+        } else {
+            result.push(new Gatling());
+        };
+    };
+    return result;
+}
+
+function buildRandomStarterDeckForBandit() {
+    let result = [];
+    for (let i = 0; i < 15; ++i) {
+        let a = getRandomInt(10);
+        if (1 <= a && a <= 2) {
+            result.push(new Dog());
+        }
+        else if (3 <= a && a <= 4) {
+            result.push(new Lad());
+        }
+        else if (5 <= a && a <= 6) {
+            result.push(new Nemo());
+        } else if (7 <= a && a <= 8) {
+            result.push(new Trasher());
+        } else {
+            result.push(new PseudoDuck());
+        };
+    };
+    return result;
+}
+
 // Дает описание существа по схожести с утками и собаками
 function getCreatureDescription(card) {
     if (isDuck(card) && isDog(card)) {
@@ -106,6 +146,8 @@ class Gatling extends Creature {
 
                 if (oppositeCard) {
                     this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+                } else {
+                    this.dealDamageToPlayer(1, gameContext, onDone);
                 }
         });
         }
@@ -170,14 +212,16 @@ class Rogue extends Creature {
     doBeforeAttack(gameContext, continuation) {
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
         const oppositeCard = oppositePlayer.table[position];
-        const prototypeOfCard = Object.getPrototypeOf(oppositeCard);
+        if (oppositeCard) {
+            const prototypeOfCard = Object.getPrototypeOf(oppositeCard);
             const properties = Object.getOwnPropertyNames(prototypeOfCard)
             for (let property of properties) {
-                let a = property;
                 if (['modifyDealedDamageToCreature', 'modifyDealedDamageToPlayer', 'modifyTakenDamage'].includes(property)) { delete prototypeOfCard[property] };
             };
             updateView();
-        continuation();
+        } else {
+            continuation();
+        }
     }
 }
 
@@ -235,46 +279,10 @@ class Nemo extends Creature {
 }
 
 // Колода Шерифа, нижнего игрока.
-const seriffStartDeck = (function () {
-    let result = [];
-    for (let i = 0; i < 15; ++i) {
-        let a = getRandomInt(10);
-        if (1 <= a && a <= 2) {
-            result.push(new Duck());
-        }
-        else if (3 <= a && a <= 4) {
-            result.push(new Rogue());
-        }
-        else if (5 <= a && a <= 6) {
-            result.push(new Brewer());
-        } else {
-            result.push(new Gatling());
-        };
-    };
-    return result;
-})();
+const seriffStartDeck = buildRandomStarterDeckForSeriff();
 
 // Колода Бандита, верхнего игрока.
-const banditStartDeck = (function () {
-    let result = [];
-    for (let i = 0; i < 15; ++i) {
-        let a = getRandomInt(10);
-        if (1 <= a && a <= 2) {
-            result.push(new Dog());
-        }
-        else if (3 <= a && a <= 4) {
-            result.push(new Lad());
-        }
-        else if (5 <= a && a <= 6) {
-            result.push(new Nemo());
-        } else if (7 <= a && a <= 8) {
-            result.push(new Trasher());
-        } else {
-            result.push(new PseudoDuck());
-        };
-    };
-    return result;
-})();
+const banditStartDeck = buildRandomStarterDeckForBandit();
 
 
 // Создание игры.
