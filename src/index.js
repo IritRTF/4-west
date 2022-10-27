@@ -255,9 +255,22 @@ class PseudoDuck extends Dog {
 class Nemo extends Creature {
     constructor(name = 'Немо', maxPower = 4, image = null) {
         super(name, maxPower, image);
+        this.isStolenPrototype = false;
     }
 
-    doBeforeAttack(gameContext, continuation) {}
+    doBeforeAttack(gameContext, continuation) {
+        const { currentPlayer, oppositePlayer, position, updateView } =
+            gameContext;
+        const oppositeCard = oppositePlayer.table[position];
+        if (oppositeCard && !this.isPrototypeStolen) {
+            this.isPrototypeStolen = true;
+            Object.setPrototypeOf(this, oppositeCard);
+            updateView();
+            this.doBeforeAttack(gameContext, continuation);
+        } else {
+            continuation();
+        }
+    }
 }
 
 const seriffStartDeck = [new Nemo()];
