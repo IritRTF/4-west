@@ -1,8 +1,9 @@
 Задача добавить новые интересные карты в карточную игру.
 
-0. «Осмотр реквизита»
+✔ 0. «Осмотр реквизита»
 Для того, чтобы запустить игру понадобится веб-сервер. Воспользуемся веб-сервером для Node.js.
 Необходимые настройки уже сделаны в `package.json`, поэтому все, что нужно сделать:
+
 - Иметь установленную Node.js.
 - Перейти в консоли в папку с `package.json` и выполнить команду `npm install`.
   Для этого можно воспользоваться встроенным в IDE терминалом (верно для WebStorm и Visual Studio Code).
@@ -14,6 +15,7 @@
   `8080` - порт веб-сервера, который часто используется в разработке (в продакшене обычно используется порт `80`).
 
 Для начала осмотрись:
+
 - Запусти `index.html` и понаблюдай как игра играет сама в себя.
 - Посмотри `index.js`. В этом файле создаются колоды карты и запускается игра.
 - Загляни в `Game.js`, обрати внимания на стадии хода.
@@ -23,6 +25,7 @@
 Правда в разработке это может мешать: только что внесенные изменения не будут появляться при обновлении страницы.
 Для перезагрузки страницы без кэша можно использовать сочетание Control+F5.
 А в Chrome можно полностью отключить кэширование в `Developer Tools`:
+
 - Открой `Developer Tools`
 - Перейди во вкладку `Network`
 - Установи флажок `Disable cache`
@@ -31,7 +34,7 @@
 Если нужно было добавить на страницу несколько скриптов, они добавлялись отдельными тэгами `script` на страницу.
 Chrome уже поддерживает использование модулей ECMAScript из коробки.
 Чтобы это работало в файле `index.html`, основной скрипт подключается так:
-  `<script type="module" src="index.js"></script>`
+`<script type="module" src="index.js"></script>`
 Кроме того, в каждом из файлов `TaskQueue.js`, `Game.js`, `Card.js`, `CardView.js`, `Player.js`, `PlayerView.js`, `SpeedRate.js`
 используются директивы `export` или `export default`, чтобы экспортировать определенные в файле сущности.
 И в этих же файлах, а еще в `index.js` используются директивы `import`, чтобы подключать сущности из других файлов.
@@ -40,11 +43,10 @@ Chrome уже поддерживает использование модулей
 
 Инструктаж окончен. Твоя задача - создавать новые типы карт, наследующиеся от Card. Можешь приступать к решению задачи!
 
-
-1. «Классы»
+✔ 1. «Классы»
 Во всем коде типы определены по-старому, через прототипы.
 Изоляция кода при этом обеспечивает за счет техники IIFE:
-  https://developer.mozilla.org/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/IIFE
+https://developer.mozilla.org/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/IIFE
 
 Благодаря использованию модулей ECMAScript каждый файл изолирован и IIFE больше не нужны,
 ведь снаружи будет видно только то, что явным образом экспортируется.
@@ -53,6 +55,7 @@ Chrome уже поддерживает использование модулей
 Результат будет тот же, но запись будет более лаконичной.
 
 Чтобы лучше понять разницу между старым и новым синтаксисом перепиши `TaskQueue` с использованием `class` и без IIFE:
+
 - Убери обрамляющую определение `TaskQueue` самовызывающуюся функцию.
 - Перенеси вверх функцию `runNextTask`, потому что это не метод `TaskQueue`.
 - Объяви тип `TaskQueue` с помощью инструкции `class`, определи constructor и все методы.
@@ -62,44 +65,44 @@ Chrome уже поддерживает использование модулей
 
 ```js
 // до переработки, старый синтаксис
-const Bar = function () {
-    function BarInternal(a, b) {
-        this.a = a;
-        this.b = b;
-    }
+const Bar = (function () {
+  function BarInternal(a, b) {
+    this.a = a;
+    this.b = b;
+  }
 
-    BarInternal.prototype.do = function (c) {
-        this.a += secret(c);
-    }
+  BarInternal.prototype.do = function (c) {
+    this.a += secret(c);
+  };
 
-    function secret(value) {
-        return 2*value;
-    }
+  function secret(value) {
+    return 2 * value;
+  }
 
-    return BarInternal;
-}();
+  return BarInternal;
+})();
 
 // после переработки, новый синтаксис
 class Bar {
-    constructor(a, b) {
-        this.a = a;
-        this.b = b;
-    }
+  constructor(a, b) {
+    this.a = a;
+    this.b = b;
+  }
 
-    do(c) {
-        this.a += secret(c);
-    }
-};
+  do(c) {
+    this.a += secret(c);
+  }
+}
 
 // эта функция доступна только внутри модуля
-function secret(value) { 
-    return 2*value;
+function secret(value) {
+  return 2 * value;
 }
 ```
 
-
 2. «Утки против собак»
-Создай в `index.js` две новые карты, используй `class` и унаследовав их от `Card`:
+   Создай в `index.js` две новые карты, используй `class` и унаследовав их от `Card`:
+
 - `Duck` с именем «Мирная утка» и силой 2
 - `Dog` с именем «Пес-бандит» и силой 3
 
@@ -118,22 +121,16 @@ https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes#%D0%9D%D0
 - Если все сделано правильно, то внизу карты утки должен быть текст Duck➔ Card, а у собаки Dog➔ Card.
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
-    new Duck(),
-];
-const banditStartDeck = [
-    new Dog(),
-];
+const seriffStartDeck = [new Duck(), new Duck(), new Duck()];
+const banditStartDeck = [new Dog()];
 ```
 
-
 3. «Утка или собака?»
-Метод `getDescriptions` в `Card` создан для того, чтобы на картах появлялась дополнительная информация.
-Его функционал хочется расширить. Причем так, чтобы это работало и для уток, и для собак,
-и для всех остальных существ, которые будут добавляться.
+   Метод `getDescriptions` в `Card` создан для того, чтобы на картах появлялась дополнительная информация.
+   Его функционал хочется расширить. Причем так, чтобы это работало и для уток, и для собак,
+   и для всех остальных существ, которые будут добавляться.
 
 - Создай новый тип `Creature` и унаследуй его от `Card`.
 - Сделай так, чтобы `Duck` и `Dog` наследовались от `Creature`.
@@ -146,25 +143,26 @@ const banditStartDeck = [
 
   Заметь, что `getDescriptions` должен возвращать массив строк, а не просто строку!
   Верный признак, что ты напутал что-то с возвращаемым значением - вертикальная надпись на карте:
-    У
-    т
-    к
-    а
+  У
+  т
+  к
+  а
   Используй `spread-оператор` (так: `[newValue, ...values]`) или метод `unshift` массива,
   чтобы дополнить возвращаемый базовой версией `getDescriptions` массив новыми значениями.
 
 Используя те же колоды, убедись, что у уток появилась надпись «Утка» над строкой с цепочкой наследования,
 а у собак надпись «Собака» над цепочкой наследования.
 
-
 4. «Громила»
-Для уток все становится плохо, когда в рядах бандитов появляется Громила.
+   Для уток все становится плохо, когда в рядах бандитов появляется Громила.
 
 Добавь карту `Trasher`:
+
 - называется Громила, сила 5, наследуется от `Dog`.
 - если Громилу атакуют, то он получает на 1 меньше урона.
 
 Подсказки:
+
 - переопредели метод `modifyTakenDamage`, чтобы уменшать урон
 - `this.view.signalAbility` — используй, чтобы при применении способности карта мигала
   Работает это так:
@@ -179,65 +177,53 @@ const banditStartDeck = [
 Не забудь вызвать реализацию из базового типа, чтобы информация «Утка или Собака» никуда не делась!
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
-    new Duck(),
-    new Duck(),
-];
-const banditStartDeck = [
-    new Trasher(),
-];
+const seriffStartDeck = [new Duck(), new Duck(), new Duck(), new Duck()];
+const banditStartDeck = [new Trasher()];
 ```
 
-
 5. «Гатлинг»
-Нехорошо нападать на мирных жителей. Это еще может быть опасно, если в сарае припрятан Гатлинг.
+   Нехорошо нападать на мирных жителей. Это еще может быть опасно, если в сарае припрятан Гатлинг.
 
 Добавь карту `Gatling`:
+
 - называется Гатлинг, сила 6, наследуется от `Creature`.
 - при атаке наносит 2 урона по очереди всем картам противника на столе, но не атакует игрока-противника.
   Таким образом урон сначала получает самая левая карта противника, затем вторая слева и так далее.
   Урон не должен наноситься одновременно.
 
 Подсказки:
+
 - переопредели метод `attack` так, чтобы урон наносился всем картам противника
 - список карт противника можно получить через `gameContext.oppositePlayer.table`
 - в качестве примера выполнения действий над несколькими картами можешь использовать `applyCards` из `Player.js`
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
-    new Duck(),
-    new Gatling(),
-];
-const banditStartDeck = [
-    new Trasher(),
-    new Dog(),
-    new Dog(),
-];
+const seriffStartDeck = [new Duck(), new Duck(), new Duck(), new Gatling()];
+const banditStartDeck = [new Trasher(), new Dog(), new Dog()];
 ```
 
-
 6. «Братки»
-Чем их больше, тем они сильнее.
+   Чем их больше, тем они сильнее.
 
 Добавь карту `Lad`:
+
 - называется Браток, сила 2, наследуется от `Dog`.
 - чем больше братков находится в игре, тем больше урона без потерь поглощается
   и больше урона по картам наносится каждым из них.
 
-Защита от урона      =  количество * (количество + 1) / 2
-Дополнительный урон  =  количество * (количество + 1) / 2
+Защита от урона = количество _ (количество + 1) / 2
+Дополнительный урон = количество _ (количество + 1) / 2
 
 Подсказки:
+
 - текущее количество братков в игре надо где-то хранить, свойство в функции-конструкторе `Lad` — подходящее место.
   Заведи для этого пару методов:
-    `static getInGameCount() { return this.inGameCount || 0; }`
-    `static setInGameCount(value) { this.inGameCount = value; }`
+  `static getInGameCount() { return this.inGameCount || 0; }`
+  `static setInGameCount(value) { this.inGameCount = value; }`
   Хоть свойство `inGameCount` в функции `Lad`, другими словами статическое свойство класса `Lad`, явно не объявляется,
   при первом вызове `setInGameCount`, оно будет создано со значением `value`.
 - чтобы обновлять количество братков в игре переопредели методы `doAfterComingIntoPlay`, `doBeforeRemoving`
@@ -252,34 +238,29 @@ const banditStartDeck = [
 переопределены методы `modifyDealedDamageToCreature` или `modifyTakenDamage`.
 Проверка на наличие свойства непосредственно у объекта выполняется с помщью метода `hasOwnProperty`.
 Проверка наличия метода `modifyDealedDamageToCreature` у братков выглядит так:
-    `Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature')`
+`Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature')`
 Эта особенность понадобится на следующем шаге.
 Как видишь, даже при использовании `class` весь функционал прототипов доступен и работает.
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
-    new Duck(),
-];
-const banditStartDeck = [
-    new Lad(),
-    new Lad(),
-];
+const seriffStartDeck = [new Duck(), new Duck(), new Duck()];
+const banditStartDeck = [new Lad(), new Lad()];
 ```
 
-
-7*. «Изгой»
+7\*. «Изгой»
 От него все бегут, потому что он приходит и отнимает силы...
 
 Добавь карту `Rogue`:
+
 - называется Изгой, сила 2, наследуется от `Creature`.
 - перед атакой на карту забирает у нее все способности к увеличению наносимого урона или уменьшению получаемого урона.
   Одновременно эти способности забираются у всех карт того же типа, но не у других типов карт.
   Изгой получает эти способности, но не передает их другим Изгоям.
 
 Подсказки:
+
 - Изгой похищает эти способности: `modifyDealedDamageToCreature`, `modifyDealedDamageToPlayer`, `modifyTakenDamage`
 - Чтобы похитить способности у всех карт некоторого типа, надо взять их из прототипа
 - Получить доступ к прототипу некоторой карты можно так: `Object.getPrototypeOf(card)`
@@ -290,33 +271,26 @@ const banditStartDeck = [
 - После похищения стоит обновить вид всех объектов игры. `updateView` из `gameContext` поможет это сделать.
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
-    new Duck(),
-    new Rogue(),
-];
-const banditStartDeck = [
-    new Lad(),
-    new Lad(),
-    new Lad(),
-];
+const seriffStartDeck = [new Duck(), new Duck(), new Duck(), new Rogue()];
+const banditStartDeck = [new Lad(), new Lad(), new Lad()];
 ```
 
-
-8*. «Пивовар»
+8\*. «Пивовар»
 Живительное пиво помогает уткам творить невозможное!
 
 Добавь карту `Brewer`:
+
 - называется Пивовар, сила 2, наследуется от `Duck`.
 - перед атакой на карту Пивовар раздает пиво,
   которое изменяет максимальную силу карты на +1, а затем текущую силу на +2.
 - Пивовар угощает пивом все карты на столе: и текущего игрока и игрока-противника,
-но только с утками, проверяя их с помощью `isDuck`.
+  но только с утками, проверяя их с помощью `isDuck`.
 - Пивовар само собой утка, поэтому его сила тоже возврастает.
 
 Подсказки:
+
 - Все карты на столе можно получить из `gameContext` так: `currentPlayer.table.concat(oppositePlayer.table)`.
 - `this.view.signalHeal` — используй, чтобы подсветить карту, у которой увеличилась сила.
 - `card.updateView()` — используй, чтобы обновлять вид карт, у которых увеличилась сила.
@@ -325,61 +299,49 @@ const banditStartDeck = [
 Добиться этого можно по разному, но решить этот вопрос раз и навсегда иначе определив свойство `currentPower` в `Card`.
 
 Сейчас оно определяется в конструкторе `Card` довольно просто:
-    `this.currentPower = maxPower`
+`this.currentPower = maxPower`
 Пусть так и определяется.
 
 А вот в `Creature` определи заново свойство `currentPower` через `get` и `set`.
 Геттер должен просто возвращать текущее значение, а сеттер не давать устанавливать значение выше, чем `this.maxPower`.
 
 Подробнее про `get` и `set` тут:
-  https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/get
-  https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/set
+https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/get
+https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/set
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Brewer(),
-];
-const banditStartDeck = [
-    new Dog(),
-    new Dog(),
-    new Dog(),
-    new Dog(),
-];
+const seriffStartDeck = [new Duck(), new Brewer()];
+const banditStartDeck = [new Dog(), new Dog(), new Dog(), new Dog()];
 ```
 
-
-9*. «Псевдоутка»
+9\*. «Псевдоутка»
 Чтобы получить доступ к живительному напитку надо всего лишь
 выглядеть как утка, плавать как утка и крякать как утка!
 
 Добавь карту `PseudoDuck`:
+
 - называется Псевдоутка, сила 3, наследуется от `Dog`.
 - Псевдоутка — это обычный пес, но еще умеет крякать и плавать, поэтому легко проходит проверку на утиность `isDuck`.
 
 Подсказки:
+
 - чтобы быть похожим на утку надо всего лишь реализовывать пару методов: `quacks` и `swims`
 - убедись, что в описании Псевдоутки присутстует «Утка-Собака».
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Duck(),
-    new Brewer(),
-];
-const banditStartDeck = [
-    new Dog(),
-    new PseudoDuck(),
-    new Dog(),
-];
+const seriffStartDeck = [new Duck(), new Brewer()];
+const banditStartDeck = [new Dog(), new PseudoDuck(), new Dog()];
 ```
 
-
-10*. «Немо»
+10\*. «Немо»
 «The one without a name without an honest heart as compass»
 
 Добавь карту `Nemo`:
+
 - называется Немо, сила 4, наследуется от `Creature`.
 - перед атакой на карту крадет ее прототип и назначает себе, получая все ее способности,
   но вместе со своим старым прототипом теряет способность красть.
@@ -387,18 +349,15 @@ const banditStartDeck = [
   то они должны быть выполнены сразу после кражи прототипа.
 
 Подсказки:
+
 - `updateView` из `gameContext` позволяет обновить вид всех объектов игры.
 - `Object.getPrototypeOf(obj)` позволяет получить прототип объекта.
 - `Object.setPrototypeOf(obj, proto)` позволяет задать протип объекту.
 - функция `doBeforeAttack` из прототипа должна быть вызвана сразу после кражи прототипа.
 
 Колоды для проверки:
+
 ```js
-const seriffStartDeck = [
-    new Nemo(),
-];
-const banditStartDeck = [
-    new Brewer(),
-    new Brewer(),
-];
+const seriffStartDeck = [new Nemo()];
+const banditStartDeck = [new Brewer(), new Brewer()];
 ```

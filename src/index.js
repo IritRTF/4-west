@@ -50,7 +50,7 @@ const seriffStartDeck = [
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Card('Бандит', 3),
+    new Card('Бандит', 4),
 ];
 
 
