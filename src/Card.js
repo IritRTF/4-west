@@ -7,7 +7,7 @@ import TaskQueue from './TaskQueue.js';
         this.image = image;
 
         this.maxPower = maxPower;
-        this.currentPower = maxPower;
+        this._currentPower = maxPower;
 
         this.view = new View();
         this.updateView();
@@ -76,7 +76,7 @@ import TaskQueue from './TaskQueue.js';
             const oppositeCard = oppositePlayer.table[position];
 
             if (oppositeCard) {
-                this.dealDamageToCreature(this.currentPower, oppositeCard, gameContext, onDone);
+                this.dealDamageToCreature(this._currentPower, oppositeCard, gameContext, onDone);
             } else {
                 this.dealDamageToPlayer(1, gameContext, onDone);
             }
@@ -169,7 +169,7 @@ import TaskQueue from './TaskQueue.js';
                 return;
             }
 
-            this.currentPower = this.currentPower - actualValue;
+            this._currentPower = this._currentPower - actualValue;
             this.updateView();
             this.view.signalDamage(onDone);
         });
@@ -224,7 +224,7 @@ import TaskQueue from './TaskQueue.js';
             name: this.name,
             descriptions: this.getDescriptions(),
             image: this.image,
-            currentPower: this.currentPower,
+            currentPower: this._currentPower,
             maxPower: this.maxPower
         });
     }
