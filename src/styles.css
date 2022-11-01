@@ -102,15 +102,27 @@ body {
 }
 
 @keyframes attackUpAnimation {
-    0% { top: 0; }
-    50% { top: -18px; }
-    100% { top: 0; }
+    0% {
+        top: 0;
+    }
+    50% {
+        top: -18px;
+    }
+    100% {
+        top: 0;
+    }
 }
 
 @keyframes attackDownAnimation {
-    0% { top: 0; }
-    50% { top: 18px; }
-    100% { top: 0; }
+    0% {
+        top: 0;
+    }
+    50% {
+        top: 18px;
+    }
+    100% {
+        top: 0;
+    }
 }
 
 .cardBack {
@@ -241,9 +253,15 @@ body {
 }
 
 @keyframes blinkAnimation {
-    0% { opacity: 0.0; }
-    50% { opacity: 0.5; }
-    100% { opacity: 0.0; }
+    0% {
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0.0;
+    }
 }
 
 .templates {
