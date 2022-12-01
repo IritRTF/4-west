@@ -219,6 +219,7 @@ class Rogue extends Creature {
                 if (['modifyDealedDamageToCreature', 'modifyDealedDamageToPlayer', 'modifyTakenDamage'].includes(property)) { delete prototypeOfCard[property] };
             };
             updateView();
+            continuation();
         } else {
             continuation();
         }
@@ -261,13 +262,12 @@ class PseudoDuck extends Dog {
 class Nemo extends Creature {
     constructor(name = 'Немо', maxPower = 4, image = 'nemo.png') {
         super(name, maxPower, image);
-        this.isPrototypeStolen = false;
     };
 
     doBeforeAttack(gameContext, continuation) {
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
         const oppositeCard = oppositePlayer.table[position];
-        if (oppositeCard && !this.isPrototypeStolen) {
+        if (oppositeCard) {
             this.isPrototypeStolen = true;
             Object.setPrototypeOf(this, oppositeCard);
             updateView();
