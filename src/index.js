@@ -94,6 +94,7 @@ class Gatling extends Creature{
         const taskQueue = new TaskQueue();
 
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+
         taskQueue.push(onDone => this.view.showAttack(onDone));
         const oppositeCards = oppositePlayer.table;
         for(let i = 0; i < oppositeCards.length; i++){
@@ -119,9 +120,9 @@ class Lad extends Dog {
         this.maxPower = currentPower;
         this.currentPower = currentPower;
     }
-
+    
     static getInGameCount() {
-        return this.inGameCount; 
+        return this.inGameCount; // || 0; 
     }
 
     static setInGameCount(value) {
@@ -135,10 +136,6 @@ class Lad extends Dog {
         continuation();
     };
 
-// Основа для утки.
-function Duck() {
-    this.quacks = function () { console.log('quack') };
-    this.swims = function () { console.log('float: both;') };
     // Позволяет определять способности, которые должны активироваться или завершаться при выходе карты из игры.
     doBeforeRemoving(continuation) {
         Lad.inGameCount = Lad.inGameCount - 1;
@@ -146,6 +143,7 @@ function Duck() {
     };
 
     static getBonus() {
+        // количество * (количество + 1) / 2
         let count = Lad.inGameCount;
         return count * (count + 1) / 2;
     }
@@ -160,6 +158,14 @@ function Duck() {
         continuation(value - Lad.getBonus());
     };
 
+    // getDescriptions(){
+    //     let descriptions = super.getDescriptions();
+    //     if(Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature') || Lad.prototype.hasOwnProperty('modifyTakenDamage')){
+    //         return ['«Чем их больше, тем они сильнее»', descriptions[1]];
+    //     }
+    //     return [getInheritanceDescription(this), descriptions[1]];
+    // }
+    
     getDescriptions() {
         let descriptions = super.getDescriptions();
         descriptions[0] = 'Чем их больше, тем они сильнее';
@@ -180,8 +186,6 @@ function getInheritanceDescription (card) {
     return names.join('➔ ');
 }
 
-// Основа для собаки.
-function Dog() {
 // 7 задание
 class Rogue extends Creature { 
     constructor(name = 'Изгой', currentPower = 2) { 
@@ -190,7 +194,7 @@ class Rogue extends Creature {
         this.maxPower = currentPower; 
         this.currentPower = currentPower; 
     }; 
-
+ 
     doBeforeAttack(gameContext, continuation) { 
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext; 
         let enemy = oppositePlayer.table[position]; 
@@ -278,7 +282,7 @@ class Nemo extends Creature{
         this.maxPower = 4;
         this.currentPower = this.maxPower;
     }
-
+    
     doBeforeAttack(gameContext, continuation) {
         const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
         const oppositeCard = oppositePlayer.table[position];
@@ -292,29 +296,104 @@ class Nemo extends Creature{
     }
 }
 
-// Колода Шерифа, нижнего игрока.
+// //Проверка 2
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+// ];
+// const banditStartDeck = [
+//     new Dog(),
+// ];
+
+// // Проверка 4
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+// ];
+// const banditStartDeck = [
+//     new Trasher(),
+// ];
+
+// //Проверка 5
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+//     new Gatling(),
+// ];
+// const banditStartDeck = [
+//     new Trasher(),
+//     new Dog(),
+//     new Dog(),
+// ];
+
+// // Проверка 6
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+// ];
+// const banditStartDeck = [
+//     new Lad(),
+//     new Lad(),
+// ];
+
+// // Проверка 7
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+//     new Rogue(),
+// ];
+// const banditStartDeck = [
+//     new Lad(),
+//     new Lad(),
+//     new Lad(),
+// ];
+
+// // Проверка 8
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Brewer(),
+// ];
+// const banditStartDeck = [
+//     new Dog(),
+//     new Dog(),
+//     new Dog(),
+//     new Dog(),
+// ];
+
+// //Проверка 9
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Brewer(),
+// ];
+// const banditStartDeck = [
+//     // new Dog(),
+//     new PseudoDuck(),
+//     new Dog(),
+// ];
+
+//Проверка 10
 const seriffStartDeck = [
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
     new Nemo(),
 ];
-
-// Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Card('Бандит', 3),
     new Gatling(),
     new Dog(),
     new Dog(),
 ];
 
-
 // Создание игры.
 const game = new Game(seriffStartDeck, banditStartDeck);
 
+// Глобальный объект, позволяющий управлять скоростью всех анимаций.
 SpeedRate.set(1);
+
 // Запуск игры.
 game.play(false, (winner) => {
     alert('Победил ' + winner.name);
-});
 });
