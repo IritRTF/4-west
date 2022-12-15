@@ -1,8 +1,8 @@
 import SpeedRate from './SpeedRate.js';
 import TaskQueue from './TaskQueue.js';
 
-const CardView = function() {
-    function CardView() {
+ class CardView  {
+    constructor() {
         this.inBottomRow = false;
         this.card = createFromTemplate();
         this.signal = this.card.querySelector('.cardSignal');
@@ -13,13 +13,13 @@ const CardView = function() {
         this.maxPower = this.card.querySelector('.cardMaxPower');
     }
 
-    CardView.prototype.putInDeck = function(deck, inBottomRow, position) {
+    putInDeck (deck, inBottomRow, position) {
         deck.appendChild(this.card);
         this.inBottomRow = inBottomRow;
         this.card.style['left'] = `${3*position}px`;
     };
 
-    CardView.prototype.updateData = function ({name, descriptions, image, currentPower, maxPower}) {
+    updateData ({ name, descriptions, image, currentPower, maxPower }) {
         this.name.innerText = name;
         if (image) {
             this.image.setAttribute('src', `images/${image}`);
@@ -29,9 +29,9 @@ const CardView = function() {
         this.descriptions.innerHTML = descriptions.map(d => `<div>${d}</div>`).join('');
         this.currentPower.innerText = currentPower;
         this.maxPower.innerText = maxPower;
-    };
+    }
 
-    CardView.prototype.flipFront = function(continuation) {
+    flipFront (continuation) {
         const taskQueue = new TaskQueue();
 
         const timeInSec = 0.5/SpeedRate.get();
@@ -43,16 +43,16 @@ const CardView = function() {
             () => {
                 this.card.style.transitionDuration = null;
             },
-            timeInSec*1000
+            timeInSec * 1000
         );
 
         taskQueue.continueWith(continuation);
-    };
+    }
 
-    CardView.prototype.flipBack = function(continuation) {
+    flipBack (continuation) {
         const taskQueue = new TaskQueue();
 
-        const timeInSec = 0.5/SpeedRate.get();
+        const timeInSec = 0.5 / SpeedRate.get();
         taskQueue.push(
             () => {
                 this.card.classList.add('flipped');
@@ -61,25 +61,25 @@ const CardView = function() {
             () => {
                 this.card.style.transitionDuration = null;
             },
-            timeInSec*1000
+            timeInSec * 1000
         );
 
         taskQueue.continueWith(continuation);
     };
 
-    CardView.prototype.signalHeal = function(continuation) {
+    signalHeal (continuation) {
         signal(this.signal, SpeedRate.get(), 'heal', continuation);
     };
 
-    CardView.prototype.signalDamage = function(continuation) {
+    signalDamage (continuation) {
         signal(this.signal, SpeedRate.get(), 'damage', continuation);
     };
 
-    CardView.prototype.signalAbility = function(continuation) {
+    signalAbility (continuation) {
         signal(this.signal, SpeedRate.get(), 'ability', continuation);
     };
 
-    CardView.prototype.showAttack = function(continuation) {
+    showAttack (continuation) {
         const taskQueue = new TaskQueue();
 
         const attackClass = this.inBottomRow ? 'attackUp' : 'attackDown';
@@ -98,9 +98,9 @@ const CardView = function() {
         );
 
         taskQueue.continueWith(continuation);
-    };
+    }
 
-    CardView.prototype.moveTo = function(target, continuation) {
+    moveTo(target, continuation) {
         const taskQueue = new TaskQueue();
 
         const targetOffset = getOffset(target);
@@ -127,7 +127,7 @@ const CardView = function() {
         taskQueue.continueWith(continuation);
     };
 
-    CardView.prototype.remove = function(continuation) {
+    remove (continuation) {
         const taskQueue = new TaskQueue();
 
         const timeInSec = 0.3/SpeedRate.get();
@@ -144,45 +144,40 @@ const CardView = function() {
         );
 
         taskQueue.continueWith(continuation);
-    };
-
     function createFromTemplate() {
-        const cardTemplate = document.getElementById('cardTemplate');
-        return cardTemplate.cloneNode(true);
-    }
+    const cardTemplate = document.getElementById('cardTemplate');
+    return cardTemplate.cloneNode(true);
+}
 
-    function signal(signalElement, speedRate, signalName, continuation) {
-        const taskQueue = new TaskQueue();
+function signal(signalElement, speedRate, signalName, continuation) {
+    const taskQueue = new TaskQueue();
 
-        const timeInSec = 0.5/speedRate;
-        taskQueue.push(
-            () => {
-                signalElement.classList.add(signalName);
-                signalElement.classList.add('blink');
-                signalElement.style.animationDuration = `${timeInSec}s`;
-            },
-            () => {
-                signalElement.classList.remove('blink');
-                signalElement.classList.remove(signalName);
-                signalElement.style.animationDuration = null;
-            },
-            timeInSec*1000
-        );
+    const timeInSec = 0.5/speedRate;
+    taskQueue.push(
+        () => {
+            signalElement.classList.add(signalName);
+            signalElement.classList.add('blink');
+            signalElement.style.animationDuration = `${timeInSec}s`;
+        },
+        () => {
+            signalElement.classList.remove('blink');
+            signalElement.classList.remove(signalName);
+            signalElement.style.animationDuration = null;
+        },
+        timeInSec*1000
+    );
 
-        taskQueue.continueWith(continuation);
-    }
+    taskQueue.continueWith(continuation);
+}
 
-    function getOffset(element) {
-        const rectangle = element.getBoundingClientRect();
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        return {
-            top: rectangle.top + scrollTop,
-            left: rectangle.left + scrollLeft
-        };
-    }
-
-    return CardView;
-}();
+function getOffset(element) {
+    const rectangle = element.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    return {
+        top: rectangle.top + scrollTop,
+        left: rectangle.left + scrollLeft
+    };
+}
 
 export default CardView;
