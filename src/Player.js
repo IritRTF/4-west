@@ -146,9 +146,7 @@ class Player {
                 card.updateView();
             }
         }
-    };
-
-    return Player;
-}();
+     }
+}
 
 export default Player;
