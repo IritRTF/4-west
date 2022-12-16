@@ -2,8 +2,8 @@ import TaskQueue from './TaskQueue.js';
 
 const PLAYER_MAX_POWER = 10;
 
-const Player = function () {
-    function Player(game, name, image, deck, view) {
+class Player {
+    constructor(game, name, image, deck, view) {
         this.game = game;
         this.name = name;
         this.image = image;
@@ -19,15 +19,15 @@ const Player = function () {
         this.updateView();
     }
 
-    Player.prototype.buildDeck = function () {
+    buildDeck() {
         let position = 0;
         for (const card of this.deck) {
             card.putInDeck(this.view.deck, this.view.inBottomRow, position)
             position++;
         }
-    };
+    }
 
-    Player.prototype.takeDamage = function (value, continuation) {
+    takeDamage(value, continuation) {
         const taskQueue = new TaskQueue();
 
         taskQueue.push(onDone => {
@@ -38,7 +38,7 @@ const Player = function () {
         });
 
         taskQueue.continueWith(continuation);
-    };
+    }
 
     Player.prototype.playNewCard = function (continuation) {
         const taskQueue = new TaskQueue();
@@ -64,7 +64,7 @@ const Player = function () {
         taskQueue.continueWith(continuation);
     };
 
-    Player.prototype.applyCards = function (continuation) {
+    applyCards(continuation) {
         const taskQueue = new TaskQueue();
 
         for(let position = 0; position < this.table.length; position++) {
@@ -80,13 +80,13 @@ const Player = function () {
         }
 
         taskQueue.continueWith(continuation);
-    };
+    }
 
-    Player.prototype.removeDeadAndCompactTable = function (continuation) {
+    removeDeadAndCompactTable (continuation) {
         this.removeDead(() => this.compactTable(continuation));
     };
 
-    Player.prototype.removeDead = function (continuation) {
+    removeDead  (continuation) {
         const taskQueue = new TaskQueue();
 
         for(let position = 0; position < this.table.length; position++) {
@@ -102,9 +102,9 @@ const Player = function () {
         }
 
         taskQueue.continueWith(continuation);
-    };
+    }
 
-    Player.prototype.compactTable = function (continuation) {
+    compactTable (continuation) {
         const taskQueue = new TaskQueue();
 
         for(let position = 0; position < this.table.length; position++) {
@@ -135,7 +135,7 @@ const Player = function () {
         taskQueue.continueWith(continuation);
     };
 
-    Player.prototype.updateView = function () {
+    updateView () {
         this.view.updateData({
             image: this.image,
             currentPower: this.currentPower,
