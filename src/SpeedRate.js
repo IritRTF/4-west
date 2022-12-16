@@ -1,18 +1,14 @@
-const SpeedRate = function() {
-    let speedRate = 1;
+class SpeedRate{
 
-    function set(value) {
-        speedRate = value;
+    static speedRate = 1;
+
+    static set(value) {
+        SpeedRate.speedRate = value;
     }
 
-    function get() {
-        return speedRate;
+   static get() {
+        return SpeedRate.speedRate;
     }
-
-    return {
-        set,
-        get
-    };
-}();
+}
 
 export default SpeedRate;
