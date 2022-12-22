@@ -1,31 +1,6 @@
-function runNextTask(taskQueue) {
-    if (taskQueue.running || taskQueue.tasks.length === 0) {
-        return;
-    }
-    taskQueue.running = true;
-    const task = taskQueue.tasks.shift();
-
-    if (task.runAndContinue) {
-        setTimeout(() => {
-            task.runAndContinue(() => {
-                task.dispose && task.dispose();
-                taskQueue.running = false;
-
-                setTimeout(() => {
-                    runNextTask(taskQueue);
-                });
-            });
-        }, 0);
-    } else {
-        runNextTask(taskQueue);
-    }
-}
-
 export default class TaskQueue {
-
     constructor() {
         this.tasks = [];
-        this.running = false;
     }
 
     push(run, dispose, duration) {
@@ -42,10 +17,35 @@ export default class TaskQueue {
                 dispose
             });
         }
-        runNextTask(this);
-    }
+        nextTask(this);
+    };
 
     continueWith(action) {
         this.push(action, null, 0);
+    };
+};
+
+function nextTask(taskQueue) {
+    if (taskQueue.running || taskQueue.tasks.length === 0) {
+        return;
+    }
+    taskQueue.running = true;
+    const currentTask = taskQueue.tasks.shift();
+
+    if (currentTask.runAndContinue) {
+        setTimeout(() => {
+            currentTask.runAndContinue(() => {
+                currentTask.dispose && currentTask.dispose();
+                taskQueue.running = false;
+
+                setTimeout(() => {
+                    nextTask(taskQueue);
+                });
+            });
+        }, 0);
+    } else {
+        nextTask(taskQueue);
     }
 }
+
+nextTask(new TaskQueue());
