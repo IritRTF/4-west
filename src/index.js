@@ -2,6 +2,7 @@ import Card from './Card.js';
 import Game from './Game.js';
 // import TaskQueue from './TaskQueue.js';
 import SpeedRate from './SpeedRate.js';
+import TaskQueue from './TaskQueue.js';
 
 // Отвечает является ли карта уткой.
 function isDuck(card) {
@@ -17,6 +18,9 @@ function isTrasher(card){
     return card instanceof Trasher;
 }
 
+function isGatling(card){
+    return card instanceof Gatling;
+}
 // Дает описание существа по схожести с утками и собаками
 function getCreatureDescription(card) {
     if (isTrasher(card)){
@@ -30,6 +34,10 @@ function getCreatureDescription(card) {
     }
     if (isDog(card)) {
         return 'Собака';
+    }
+
+    if (isGatling(card)){
+        return 'Гатлинг-пушка'
     }
 
    
@@ -80,26 +88,56 @@ class Trasher extends Dog{
         this.view.signalAbility(() => {
             continuation(value-1)})
     }
-    
+}
+
+class Gatling extends Creature{
+    constructor(name, maxPower=6, image){
+        super('Gatling', maxPower, image, 'Гатлинг-пушка')
+    }
+    attack(gameContext, continuation){
+        const taskQueue = new TaskQueue();
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        this.table = gameContext.oppositePlayer.table;
+        for (let pos = 0; pos < this.table.length; pos++){
+            const card = this.table[pos]
+            taskQueue.push(onDone => this.view.showAttack(onDone));
+            this.dealDamageToCreature(2, card, gameContext, continuation);
+            
+        }
+        taskQueue.continueWith(continuation);
+    }
 
 }
 
 
-// Колода Шерифа, нижнего игрока.
-const seriffStartDeck = [
-    new Duck(),
-    new Duck('Бугай', 3),
-    new Duck('Бугай побольше', 4),
-    new Duck('Мирный житель', 2),
-];
+// // Колода Шерифа, нижнего игрока.
+// const seriffStartDeck = [
+//     new Duck(),
+//     new Duck('Бугай', 3),
+//     new Duck('Бугай побольше', 4),
+//     new Duck('Мирный житель', 2),
+// ];
 
-// Колода Бандита, верхнего игрока.
+// // Колода Бандита, верхнего игрока.
+// const banditStartDeck = [
+//     new Dog(),
+//     new Trasher(),
+//     new Dog('Очень большая собака', 5),
+//     new Dog('Какая-то мелочь', 2),
+//     new Dog('Обычная собака')
+// ];
+
+const seriffStartDeck = [
+    new Gatling(),
+    new Duck(),
+    new Duck(),
+    new Duck(),
+    new Gatling(),
+];
 const banditStartDeck = [
-    new Dog(),
     new Trasher(),
-    new Dog('Очень большая собака', 5),
-    new Dog('Какая-то мелочь', 2),
-    new Dog('Обычная собака')
+    new Dog(),
+    new Dog(),
 ];
 
 
