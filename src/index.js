@@ -13,8 +13,15 @@ function isDog(card) {
     return card instanceof Dog;
 }
 
+function isTrasher(card){
+    return card instanceof Trasher;
+}
+
 // Дает описание существа по схожести с утками и собаками
 function getCreatureDescription(card) {
+    if (isTrasher(card)){
+        return 'Trasher'
+    }
     if (isDuck(card) && isDog(card)) {
         return 'Утка-Собака';
     }
@@ -24,24 +31,29 @@ function getCreatureDescription(card) {
     if (isDog(card)) {
         return 'Собака';
     }
+
+   
+
+
     return 'Существо';
 }
 
 
 class Creature extends Card{
-    constructor(name, maxPower, image){
+    constructor(name, maxPower, image, ...descriptions){
         super(name, maxPower, image)
+        this.description = descriptions
     }
 
-    getDescriptions(values = ''){
-            return [getCreatureDescription(this), ...values, , `MaxPower: ${this.maxPower}`, super.getDescriptions()]
+    getDescriptions(...values){
+            return [getCreatureDescription(this), `MaxPower: ${this.maxPower}`, super.getDescriptions(), ...values, this.description]
     }
 }
 
 
 // Основа для утки.
 class Duck extends Creature{
-    constructor(name = 'Какая-то утка', maxPower = 2, image) {
+    constructor(name = 'Какая-то утка', maxPower = 2, image, ...description) {
         super(name, maxPower, image);
     }
     quacks(){
@@ -54,9 +66,22 @@ class Duck extends Creature{
 }
 
 class Dog extends Creature{
-    constructor(name = 'Какая-то собака', maxPower = 3, image) {
-        super(name, maxPower, image);
+    constructor(name = 'Какая-то собака', maxPower = 3, image, ...description) {
+        super(name, maxPower, image, description);
     }
+}
+
+class Trasher extends Dog{
+    constructor(name, maxPower = 5, image){
+        let description = 'Очень мощьный юнит. Хана кряквам.'
+        super('Trasher', maxPower, image, description)
+    }
+    modifyTakenDamage(value, fromCard, gameContext, continuation){
+        this.view.signalAbility(() => {
+            continuation(value-1)})
+    }
+    
+
 }
 
 
@@ -71,6 +96,7 @@ const seriffStartDeck = [
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
     new Dog(),
+    new Trasher(),
     new Dog('Очень большая собака', 5),
     new Dog('Какая-то мелочь', 2),
     new Dog('Обычная собака')
