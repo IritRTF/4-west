@@ -40,9 +40,6 @@ function getCreatureDescription(card) {
         return 'Гатлинг-пушка'
     }
 
-   
-
-
     return 'Существо';
 }
 
@@ -109,8 +106,52 @@ class Gatling extends Creature{
 
 }
 
+class Lad extends Dog{
+    constructor(name, maxPower=2, image){
+        super('Братки', maxPower, image)
+    }
 
-// // Колода Шерифа, нижнего игрока.
+    static getInGameCount() {
+         return this.inGameCount || 0; 
+        }
+    static setInGameCount(value) { 
+        this.inGameCount = value; 
+    }
+    
+    static getBonus(){
+        const count = this.getInGameCount();
+        return count*(count +1)/2;
+    }
+    doAfterComingIntoPlay(gameContext, continuation){
+        Lad.setInGameCount(Lad.getInGameCount() + 1)
+        continuation();
+
+    }
+
+    doBeforeRemoving(continuation){
+        Lad.setInGameCount(Lad.getInGameCount() - 1)
+        continuation();
+    }
+    
+    modifyTakenDamage(value, fromCard, gameContext, continuation){
+        continuation(value-Lad.getBonus())
+        }
+
+    modifyDealedDamageToCreature(value, toCard, gameContext, continuation){
+        continuation(value+Lad.getBonus()) 
+        }
+     
+
+    getDescriptions(){
+        //Проверяем наличие методов modifyTakenDamage и modifyDealedDamageToCreature
+        return Lad.prototype.hasOwnProperty('modifyTakenDamage') && Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature') ?
+        [super.getDescriptions(this), 'Чем из больше темони сильнее'] : 
+        super.getDescriptions(this)
+    }}
+        
+
+
+// Колода Шерифа, нижнего игрока.
 // const seriffStartDeck = [
 //     new Duck(),
 //     new Duck('Бугай', 3),
@@ -127,17 +168,27 @@ class Gatling extends Creature{
 //     new Dog('Обычная собака')
 // ];
 
+// const seriffStartDeck = [
+//     new Gatling(),
+//     new Duck(),
+//     new Duck(),
+//     new Duck(),
+//     new Gatling(),
+// ];
+// const banditStartDeck = [
+//     new Trasher(),
+//     new Dog(),
+//     new Dog(),
+// ];
+
 const seriffStartDeck = [
-    new Gatling(),
     new Duck(),
     new Duck(),
     new Duck(),
-    new Gatling(),
 ];
 const banditStartDeck = [
-    new Trasher(),
-    new Dog(),
-    new Dog(),
+    new Lad(),
+    new Lad(),
 ];
 
 
