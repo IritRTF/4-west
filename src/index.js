@@ -3,6 +3,65 @@ import Game from './Game.js';
 import TaskQueue from './TaskQueue.js';
 import SpeedRate from './SpeedRate.js';
 
+class Creature extends Card{
+    getDescriptions(){
+        let firstStr = super.getDescriptions();
+        let secondStr = getCreatureDescription(this);
+        return [firstStr, secondStr];
+    }
+}
+
+class Duck extends Creature{
+    constructor(name = 'Мирная утка', maxPower = 2){
+        super(name, maxPower)
+    }
+    quacks() { console.log('quack') };
+    swims() { console.log('float: both;') };
+}
+
+class Dog extends Creature{
+    constructor(name  = 'Пес-бандит',  maxPower = 3){
+        super(name, maxPower)
+    }
+}
+
+class Gatling extends Creature{
+    constructor(name  = 'Гатлинг',  maxPower = 6){
+        super(name, maxPower)
+    }
+    attack(gameContext, continuation) {
+        const taskQueue = new TaskQueue();
+
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        for (let index = 0; index < oppositePlayer.table.length; index++) {
+            const element = oppositePlayer.table[index];
+            taskQueue.push(onDone => this.view.showAttack(onDone));
+            taskQueue.push(onDone => {
+
+                if (element) {
+                    this.dealDamageToCreature(2, element, gameContext, onDone);
+                } 
+            });
+
+        }
+        taskQueue.continueWith(continuation);
+    };
+}
+
+
+
+class Trasher extends Dog{
+    constructor(name = 'Мусорщик', maxPower = 5){
+        super (name, maxPower)
+    }
+    modifyTakenDamage(value, fromCard, gameContext, continuation) {
+        this.view.signalAbility(() => {continuation(value - 1)});
+    };
+    getDescriptions(){
+        return ['Полученный урон меньше на 1', super.getDescriptions()];
+    }
+}
+
 // Отвечает является ли карта уткой.
 function isDuck(card) {
     return card && card.quacks && card.swims;
@@ -27,30 +86,17 @@ function getCreatureDescription(card) {
     return 'Существо';
 }
 
-
-
-// Основа для утки.
-function Duck() {
-    this.quacks = function () { console.log('quack') };
-    this.swims = function () { console.log('float: both;') };
-}
-
-
-// Основа для собаки.
-function Dog() {
-}
-
-
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
-    new Card('Мирный житель', 2),
+    new Duck(),
+    
+    new Duck(),
 ];
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Card('Бандит', 3),
+    new Trasher(),
+    new Dog(),
 ];
 
 
